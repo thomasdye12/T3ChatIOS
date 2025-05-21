@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		E9AB5F7F2DDD36A100B3DD5B /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = E9AB5F7E2DDD36A100B3DD5B /* MarkdownUI */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		E9AB5E652DDD289500B3DD5B /* T3ChatIOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = T3ChatIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -15,6 +19,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				UI/Untitled.swift,
 			);
 			target = E9AB5E642DDD289500B3DD5B /* T3ChatIOS */;
 		};
@@ -36,6 +41,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E9AB5F7F2DDD36A100B3DD5B /* MarkdownUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +84,7 @@
 			);
 			name = T3ChatIOS;
 			packageProductDependencies = (
+				E9AB5F7E2DDD36A100B3DD5B /* MarkdownUI */,
 			);
 			productName = T3ChatIOS;
 			productReference = E9AB5E652DDD289500B3DD5B /* T3ChatIOS.app */;
@@ -107,6 +114,9 @@
 			);
 			mainGroup = E9AB5E5C2DDD289500B3DD5B;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				E9AB5F7D2DDD36A100B3DD5B /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E9AB5E662DDD289500B3DD5B /* Products */;
 			projectDirPath = "";
@@ -148,11 +158,13 @@
 				DEVELOPMENT_TEAM = K3S7UENN8E;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = T3ChatIOS/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Chat App";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -176,11 +188,13 @@
 				DEVELOPMENT_TEAM = K3S7UENN8E;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = T3ChatIOS/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Chat App";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -335,6 +349,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E9AB5F7D2DDD36A100B3DD5B /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.4.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E9AB5F7E2DDD36A100B3DD5B /* MarkdownUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E9AB5F7D2DDD36A100B3DD5B /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
+			productName = MarkdownUI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E9AB5E5D2DDD289500B3DD5B /* Project object */;
 }
