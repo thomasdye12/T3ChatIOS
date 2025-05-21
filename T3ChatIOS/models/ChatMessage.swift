@@ -8,6 +8,7 @@
 import SwiftUI
 import Combine
 import ConvexMobile
+import AppIntents
 
 // MARK: - Model
 struct ChatMessage: Identifiable, Codable {
@@ -110,23 +111,73 @@ struct ChatStreamProviderMetadata: Decodable {
     // For now, let's keep it simple as a general container if not directly used
 }
 
+struct Model: Codable, Identifiable, Hashable, AppEntity {
+    static var typeDisplayRepresentation: TypeDisplayRepresentation = .init(name: "model")
+    
+      typealias DefaultQueryType = ModelQuery
+      static var defaultQuery: ModelQuery = ModelQuery()
 
-struct Model:Codable,Identifiable {
-    let id:String
-    let name:String
-    var SearchEngin:Bool? = false
+      static var typeDisplayName: LocalizedStringResource = LocalizedStringResource("Model", defaultValue: "Model")
+      var displayRepresentation: DisplayRepresentation {
+          DisplayRepresentation(title: .init(stringLiteral: name))
+      }
+    
+    let id: String
+    let name: String
+    var SearchEngin: Bool? = false
+
+    // Initializer remains the same
+    init(id: String, name: String, SearchEngin: Bool? = false) {
+        self.id = id
+        self.name = name
+        self.SearchEngin = SearchEngin
+    }
+
+    // Equatable and Hashable conformance are still necessary for this struct
+    // to be used as a parameter and within the DynamicOptionsProvider.
+    static func == (lhs: Model, rhs: Model) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
 }
 
+// Your predefined list of models (remains the same)
+// In a real app, this would likely come from an API or local persistent store.
+let models: [Model] = [
+    .init(id: "gemini-2.5-flash", name: "Gemini 2.5 (Flash)", SearchEngin: true),
+    .init(id: "gpt-4.1", name: "GPT-4.1"),
+    .init(id: "gemini-2.5-flash2", name: "Gemini 2.5 (Flash) 2"),
+    .init(id: "gemini-2.5-flash3", name: "Gemini 2.5 (Flash) 3"),
+    .init(id: "gemini-2.5-flash4", name: "Gemini 2.5 (Flash) 4")
+]
 
-// need some sort of endpoint to get all current models from the system, could not find that.
-let models:[Model] = [
-    .init(id:"gemini-2.5-flash",name:"Gemini 2.5 (Flash)",SearchEngin: true),
-    .init(id:"gpt-4.1",name:"gpt-4.1"),
-    .init(id:"gemini-2.5-flash2",name:"Gemini 2.5 (Flash)2"),
-    .init(id:"gemini-2.5-flash3",name:"Gemini 2.5 (Flash)3"),
-    .init(id:"gemini-2.5-flash4",name:"Gemini 2.5 (Flash)4")
-    ]
+
+struct ModelQuery: EntityStringQuery {
+    func entities(for identifiers: [String]) async throws -> [Model] {
+        return models.filter({ identifiers.contains($0.id) })
+    }
     
+    typealias Entity = Model
+    func entities(matching string: String) async throws -> [Model] {
+        return models.filter({ $0.name.starts(with: string)})
+    }
+
+//    func entities(for identifiers: [UUID]) async throws -> [Model] {
+//        return models.filter({ identifiers.contains($0.id) })
+//    }
+}
+
+struct ModelOptionsProvider: DynamicOptionsProvider {
+ 
+    
+    func results() async throws -> [Model] {
+        return models
+    }
+}
+
 
 
 

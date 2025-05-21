@@ -1,4 +1,4 @@
-## AI Chat app for T3 Chat 
+# AI Chat app for T3 Chat 
 
 
 This app is not associated with T3 chat, however I have built this app to allow me to use it on my IOS device, it is not in any way feature complete with the web version. 
@@ -14,17 +14,16 @@ I will happily welcome Pull requests.
 
 If you are Theo, I wanna say I hope this is okay, if not please get in touch and I will take it down, but keep up the good work with the website and youtube, you have inspired me as a 21 year old dev who's background is in IOS and is now unemployed here in the UK.
 
-Current working features:
+## Current working features:
 Chat - supports only two models right now but more can be added easy - looking for an API for the info
-
-chat history  - view all conversations history, no support for uploads and attachments yet. 
+Chat history  - view all conversations history, no support for uploads and attachments yet. 
 Chats are added to your account now
+Unpinning and pinning chats in the previous chats page
+Apple Shortcut support - send one message into a shortcut, and get a response back - no ability to continue conversation right now
 
 I Think thats it, right now. 
 
 I am working on the following:
-saving chats to your account
-pinning and unpinning chats 
 more models
 other stuff that I can't remember 
 

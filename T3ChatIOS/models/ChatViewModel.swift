@@ -362,6 +362,43 @@ class ChatViewModel: ObservableObject {
             print(Int(Date().timeIntervalSince1970 * 1000))
             return Int(Date().timeIntervalSince1970 * 1000)
         }
+    
+    
+    func fetchCompleteResponse(userMessage: ConvexChatMessage) async throws -> String {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
+            var accumulated = ""
+
+            // Kick off the Combine stream
+        fetchResponseStream(userMessage: userMessage)
+                .receive(on: DispatchQueue.main)
+                .sink { completion in
+                    switch completion {
+                    case .finished:
+                        // Stream ended successfully—return the full text
+                        continuation.resume(returning: accumulated)
+
+                    case .failure(let error):
+                        // Stream failed—propagate the error
+                        continuation.resume(throwing: error)
+                    }
+                } receiveValue: { event in
+                    switch event {
+                    case .content(let content):
+                        // Append each chunk as it arrives
+                        accumulated += content.content
+                    default:
+                        // ignore other event types
+                        break
+                    }
+                }
+                .store(in: &cancellables)
+        }
+    }
+    
 }
 
 // MARK: - Bubble View
+
+extension T3ChatUserShared {
+    
+}
