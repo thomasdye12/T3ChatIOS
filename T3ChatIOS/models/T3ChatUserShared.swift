@@ -5,18 +5,29 @@
 //  Created by Thomas Dye on 20/05/2025.
 //
 
+
+
 import Foundation
 import SwiftUI
 import UIKit
+import ConvexMobile
+
 class T3ChatUserShared:ObservableObject {
+ 
     
-    var accessToken:String?
+    var accessToken:String? {
+        didSet {
+            if let accessToken = accessToken{
+                SetuConvex(JWT: accessToken)
+            }
+         
+        }
+    }
     
     
     static let shared = T3ChatUserShared()
-    
+    var SessionID:UUID = UUID()
     var MainVC:UIViewController?
-    
     @Published var CurrentUserChat:ChatViewModel?
     
     @Published var selectedModel: Model? = models.first
@@ -26,7 +37,8 @@ class T3ChatUserShared:ObservableObject {
         reasoningEffort: "medium",
         includeSearch: false
     )
-    
+//    wss://api.sync.t3.chat/api/1.23.0/sync
+    var convex:T3ConvexWrapper?
     
     func CreateNewChat(model:Model?) {
         
@@ -37,6 +49,8 @@ class T3ChatUserShared:ObservableObject {
     init(){
         if let token = GetUserToken(){
             accessToken = token
+            SetuConvex(JWT: token)
+         
         }
     }
     
@@ -47,6 +61,8 @@ class T3ChatUserShared:ObservableObject {
     }
     
     func GetUserToken() -> String? {
+
+        
         return UserDefaults.standard.string(forKey: "T3AccessToken")
     }
     func Cookies() -> String {
@@ -62,4 +78,26 @@ class T3ChatUserShared:ObservableObject {
         }
 
     }
+
+//     attempting to connect to a convex sync and get that work, defiantly dont know enough about it 
+    func SetuConvex(JWT:String) {
+        convex = T3ConvexWrapper(SessionID: SessionID.uuidString,JWT:JWT)
+    }
+    
+    
+    
+     func formattedDate(_ date: Date) -> String {
+        let calendar = Calendar.current
+        if calendar.isDateInToday(date) {
+            return "Today"
+        } else if calendar.isDateInYesterday(date) {
+            return "Yesterday"
+        } else {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateStyle = .medium
+            dateFormatter.timeStyle = .none
+            return dateFormatter.string(from: date)
+        }
+    }
+    
 }

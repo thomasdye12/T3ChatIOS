@@ -21,6 +21,22 @@ class ChatViewModel: ObservableObject {
         self.model = model
     }
 
+    @MainActor
+    init(threadId:String) {
+        self.model = models.first!
+        Task {
+            let latestChatPublisher =  T3ChatUserShared.shared.convex?.GetThreadByIdPublisher(id: threadId)
+            if let latestChat = latestChatPublisher {
+                for await chats in latestChat.values {
+                    messages = chats.map { $0.ConvertToMessage() }
+                    if let lastChat = chats.last  {
+                        self.model = models.first(where: { $0.id == lastChat.model }) ?? models.first!
+                    }
+                }
+            }
+        }
+
+    }
 
     private let preferences = Preferences(
         name: "",
@@ -31,13 +47,13 @@ class ChatViewModel: ObservableObject {
     private let userInfoPayload = UserInfoPayload(timezone: "Europe/London")
 
     private var threadMetadata = ThreadMetadata(id: UUID())
-    private var lastResponseId: UUID?
+    private var lastResponseId: String?
 
     /// Load any initial messages and thread metadata
     func loadInitial(
         messages: [ChatMessage],
         threadId: UUID? = nil,
-        responseId: UUID? = nil
+        responseId: String? = nil
     ) {
         self.messages = messages
         if let tid = threadId {
@@ -49,10 +65,10 @@ class ChatViewModel: ObservableObject {
     /// Send a user message and fetch assistant response
     func send(_ text: String) {
         let userMsg = ChatMessage(
-            id: UUID(),
+            id: UUID().uuidString,
             content: text,
-            role: .user,
-            attachments: []
+            role: .user
+//            attachments: []
         )
         messages.append(userMsg)
         isSending = true
@@ -104,10 +120,9 @@ class ChatViewModel: ObservableObject {
                 case .messageId(let msgId):
                     // Create the initial assistant message placeholder
                     let assistantMsg = ChatMessage(
-                        id: UUID(uuidString: msgId.messageId) ?? UUID(),
+                        id:  msgId.messageId,
                         content: "",
-                        role: .assistant,
-                        attachments: []
+                        role: .assistant
                     )
                     self.messages.append(assistantMsg)
                     self.lastResponseId = assistantMsg
@@ -172,11 +187,12 @@ class ChatViewModel: ObservableObject {
         let payload = ChatRequest(
             messages: messages,
             threadMetadata: threadMetadata,
-            responseMessageId: lastResponseId ?? UUID(),
+            responseMessageId: lastResponseId ?? UUID().uuidString,
             model: model.id,
             modelParams: T3ChatUserShared.shared.modelParams,
             preferences: preferences,
-            userInfo: userInfoPayload
+            userInfo: userInfoPayload,
+            convexSessionId: T3ChatUserShared.shared.SessionID.uuidString
         )
 
         do {

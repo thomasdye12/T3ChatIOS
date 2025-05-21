@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		E9AB5F7F2DDD36A100B3DD5B /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = E9AB5F7E2DDD36A100B3DD5B /* MarkdownUI */; };
+		E9AB5F892DDD760B00B3DD5B /* ConvexMobile in Frameworks */ = {isa = PBXBuildFile; productRef = E9AB5F882DDD760B00B3DD5B /* ConvexMobile */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +43,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E9AB5F7F2DDD36A100B3DD5B /* MarkdownUI in Frameworks */,
+				E9AB5F892DDD760B00B3DD5B /* ConvexMobile in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,6 +87,7 @@
 			name = T3ChatIOS;
 			packageProductDependencies = (
 				E9AB5F7E2DDD36A100B3DD5B /* MarkdownUI */,
+				E9AB5F882DDD760B00B3DD5B /* ConvexMobile */,
 			);
 			productName = T3ChatIOS;
 			productReference = E9AB5E652DDD289500B3DD5B /* T3ChatIOS.app */;
@@ -116,6 +119,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				E9AB5F7D2DDD36A100B3DD5B /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
+				E9AB5F872DDD760B00B3DD5B /* XCRemoteSwiftPackageReference "convex-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E9AB5E662DDD289500B3DD5B /* Products */;
@@ -359,6 +363,14 @@
 				minimumVersion = 2.4.1;
 			};
 		};
+		E9AB5F872DDD760B00B3DD5B /* XCRemoteSwiftPackageReference "convex-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/get-convex/convex-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.5.5;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -366,6 +378,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E9AB5F7D2DDD36A100B3DD5B /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
 			productName = MarkdownUI;
+		};
+		E9AB5F882DDD760B00B3DD5B /* ConvexMobile */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E9AB5F872DDD760B00B3DD5B /* XCRemoteSwiftPackageReference "convex-swift" */;
+			productName = ConvexMobile;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

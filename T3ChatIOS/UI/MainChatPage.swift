@@ -58,7 +58,9 @@ struct MainChatPage: View {
                 SettingsView() // Display the settings in a popup
             }
             .sheet(isPresented: $showPreviousChats) {
-                PreviousChatsView() // Display previous chats in a popup
+                PreviousChatsView(userInfo: userInfo, onChatSelected: {Thread in
+                    userInfo.CurrentUserChat = .init(threadId: Thread.threadId)
+                }) // Display previous chats in a popup
             }
         }
     }
@@ -68,14 +70,6 @@ struct MainChatPage: View {
 // Placeholder Views for Settings and Previous Chats
 
 
-struct PreviousChatsView: View {
-    var body: some View {
-        Text("Previous Chats Content Here")
-            .padding()
-        Text("This has not been built yet, coming soon")
-            .padding()
-    }
-}
 
 
 #Preview {

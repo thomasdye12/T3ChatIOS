@@ -50,18 +50,18 @@ struct ChatBubble: View {
 #Preview {
     VStack(alignment: .leading) {
                 ChatBubble(
-                    message: ChatMessage(id:UUID(),
+                    message: ChatMessage(id:UUID().uuidString,
                         content: "Hello there! How are you?\n```\nfunc greet() {\n  print(\"Hello\")\n}\n```\nThis is some more text after the code.",
-                                         role: .assistant,
-                                         attachments: []
+                                         role: .assistant
+//                                         attachments: []
                     )
                 )
                 ChatBubble(
                     message: ChatMessage(
-                        id:UUID(),
+                        id:UUID().uuidString,
                         content: "I'm good! Thanks for asking.\n```\nlet x = 10\nlet y = 20\nlet sum = x + y\nprint(sum)\n```",
-                        role: .user,
-                        attachments: []
+                        role: .user
+//                        attachments: []
                     )
                 )
             }

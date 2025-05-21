@@ -10,13 +10,18 @@ import Combine
 
 // MARK: - Model
 struct ChatMessage: Identifiable, Codable {
-    let id: UUID
+    let id: String
     var content: String
     let role: Role
-    let attachments: [String]
+//    let attachments: [String]
 
     enum Role: String, Codable {
         case user, assistant
+    }
+    enum CodingKeys: String, CodingKey {
+        case id = "_id"
+        case content
+        case role
     }
 }
 
@@ -43,12 +48,12 @@ struct UserInfoPayload: Codable {
 struct ChatRequest: Codable {
     let messages: [ChatMessage]
     let threadMetadata: ThreadMetadata
-    let responseMessageId: UUID
+    let responseMessageId: String
     let model: String
     let modelParams: ModelParams
     let preferences: Preferences
     let userInfo: UserInfoPayload
-    let convexSessionId:String = ""
+    let convexSessionId:String
     
 }
 
@@ -121,3 +126,81 @@ let models:[Model] = [
     .init(id:"gemini-2.5-flash4",name:"Gemini 2.5 (Flash)4")
     ]
     
+
+
+
+
+
+// Convex
+
+
+
+struct ConvexMessageThread: Codable,Identifiable {
+    let creationTime: Double
+    let id: String
+    let branchParent: String?
+    let createdAt: Double
+    let generationStatus: String
+    let lastMessageAt: Double
+    let model: String
+    let pinned: Bool
+    let threadId: String
+    let title: String
+    let updatedAt: Double
+    let userId: String
+    let userSetTitle: Bool?
+    let visibility: String
+
+    enum CodingKeys: String, CodingKey {
+        case creationTime = "_creationTime"
+        case id           = "_id"
+        case branchParent
+        case createdAt
+        case generationStatus
+        case lastMessageAt
+        case model
+        case pinned
+        case threadId
+        case title
+        case updatedAt
+        case userId
+        case userSetTitle
+        case visibility
+    }
+    
+    
+    func creationTimeSeconds() -> Double {
+//        convert the milisectionds to seconds
+        return creationTime / 1000
+    }
+    
+    func lastMessageAtSeconds() -> Double {
+//        convert the milisectionds to seconds
+        return lastMessageAt / 1000
+    }
+}
+
+
+
+struct ConvexChatMessage:Identifiable, Codable {
+        let id: String
+        let userId:String
+        var content: String
+        let role: ChatMessage.Role
+        let model:String
+    //    let attachments: [String]
+
+
+        enum CodingKeys: String, CodingKey {
+            case id = "_id"
+            case content
+            case role
+            case model
+            case userId
+        }
+    
+    
+    func ConvertToMessage() -> ChatMessage {
+        return .init(id: id, content: content, role: role)
+    }
+}

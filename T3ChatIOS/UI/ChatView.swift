@@ -182,8 +182,8 @@ struct ChatWrapper: View {
 
 func loadSampleChats()  -> ChatViewModel{
     let sample = [
-               ChatMessage(id: UUID(), content: "Hello! How can I help you?", role: .assistant, attachments: []),
-               ChatMessage(id: UUID(), content: "Just testing, thanks!", role: .user, attachments: [])
+        ChatMessage(id: UUID().uuidString, content: "Hello! How can I help you?", role: .assistant),
+        ChatMessage(id: UUID().uuidString, content: "Just testing, thanks!", role: .user)
            ]
     let vm = ChatViewModel(model: models.first!)
 //           vm.loadInitial(messages: sample)
