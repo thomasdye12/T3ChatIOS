@@ -14,6 +14,24 @@ I will happily welcome Pull requests.
 
 If you are Theo, I wanna say I hope this is okay, if not please get in touch and I will take it down, but keep up the good work with the website and youtube, you have inspired me as a 21 year old dev who's background is in IOS and is now unemployed here in the UK.
 
+Current working features:
+Chat - supports only two models right now but more can be added easy - looking for an API for the info
+
+chat history  - view all conversations history, no support for uploads and attachments yet. 
+Chats are added to your account now
+
+I Think thats it, right now. 
+
+I am working on the following:
+saving chats to your account
+pinning and unpinning chats 
+more models
+other stuff that I can't remember 
+
+
+
+
+
 
 If anyone has info on the following it would be helpful, 
 
@@ -26,4 +44,4 @@ Rest endpoint for getting chat history for a thread
 
 
 This was made by me Thomas Dye 
-
+I started this project on the 20 may 2025

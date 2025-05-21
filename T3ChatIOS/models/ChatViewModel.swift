@@ -9,7 +9,7 @@ import SwiftUI
 import Combine
 
 class ChatViewModel: ObservableObject {
-    @Published var messages: [ChatMessage] = []
+    @Published var messages: [ConvexChatMessage] = []
     @Published var isSending: Bool = false
 
     private var cancellables = Set<AnyCancellable>()
@@ -28,8 +28,9 @@ class ChatViewModel: ObservableObject {
             let latestChatPublisher =  T3ChatUserShared.shared.convex?.GetThreadByIdPublisher(id: threadId)
             if let latestChat = latestChatPublisher {
                 for await chats in latestChat.values {
-                    messages = chats.map { $0.ConvertToMessage() }
+                    messages = chats
                     if let lastChat = chats.last  {
+                        threadMetadata = .init(id:threadId)
                         self.model = models.first(where: { $0.id == lastChat.model }) ?? models.first!
                     }
                 }
@@ -46,35 +47,40 @@ class ChatViewModel: ObservableObject {
     )
     private let userInfoPayload = UserInfoPayload(timezone: "Europe/London")
 
-    private var threadMetadata = ThreadMetadata(id: UUID())
+    private var threadMetadata = ThreadMetadata(id: UUID().uuidString)
     private var lastResponseId: String?
 
     /// Load any initial messages and thread metadata
     func loadInitial(
-        messages: [ChatMessage],
+        messages: [ConvexChatMessage],
         threadId: UUID? = nil,
         responseId: String? = nil
     ) {
         self.messages = messages
         if let tid = threadId {
-            threadMetadata = ThreadMetadata(id: tid)
+            threadMetadata = ThreadMetadata(id: tid.uuidString)
         }
         lastResponseId = responseId
     }
 
     /// Send a user message and fetch assistant response
     func send(_ text: String) {
-        let userMsg = ChatMessage(
-            id: UUID().uuidString,
+        let userMsg = ConvexChatMessage(
+            messageId: UUID().uuidString,
             content: text,
-            role: .user
+            role: .user,
+            model: model.id, modelParams: nil,
+            created_at: CurrentTime(), status: .done, attachmentIds: [], updated_at: CurrentTime()
+            
 //            attachments: []
         )
         messages.append(userMsg)
+
+    
         isSending = true
 
         // We'll now subscribe to the stream of events
-        fetchResponseStream()
+        fetchResponseStream(userMessage: userMsg)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 self?.isSending = false
@@ -95,15 +101,17 @@ class ChatViewModel: ObservableObject {
                     if let lastAssistantMessage = self.messages.last(
                         where: { $0.role == .assistant }
                     ),
-                        lastAssistantMessage.id == self.lastResponseId
+                       lastAssistantMessage.messageId == self.lastResponseId
                     {
                         // Append to existing message
                         var updatedMessage = lastAssistantMessage
                         updatedMessage.content += content.content
                         if let index = self.messages.firstIndex(where: {
-                            $0.id == updatedMessage.id
+                            $0.messageId == updatedMessage.messageId
                         }) {
                             self.messages[index] = updatedMessage
+                        } else {
+                            print("FAILED TO UDPATE MEESAGE INDEX")
                         }
                     } else {
                         // This might be the first chunk for a new message,
@@ -119,14 +127,6 @@ class ChatViewModel: ObservableObject {
                     }
                 case .messageId(let msgId):
                     // Create the initial assistant message placeholder
-                    let assistantMsg = ChatMessage(
-                        id:  msgId.messageId,
-                        content: "",
-                        role: .assistant
-                    )
-                    self.messages.append(assistantMsg)
-                    self.lastResponseId = assistantMsg
-                        .id  // Update last response ID for subsequent chunks
                     self.threadMetadata.id =
                         self.threadMetadata
                         .id  // No change to thread ID based on f:
@@ -172,7 +172,7 @@ class ChatViewModel: ObservableObject {
     }
 
     /// Real network call for streaming
-    private func fetchResponseStream() -> AnyPublisher<ChatStreamEvent, Error> {
+    private func fetchResponseStream(userMessage:ConvexChatMessage) -> AnyPublisher<ChatStreamEvent, Error> {
         guard let url = URL(string: "https://beta.t3.chat/api/chat") else {
             return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
         }
@@ -184,17 +184,34 @@ class ChatViewModel: ObservableObject {
             forHTTPHeaderField: "Cookie"
         )
 
+        
+        
+        let assistantMsg = ConvexChatMessage(
+            messageId:  UUID().uuidString,
+            content: "",
+            role: .assistant,
+            model: model.id, modelParams: T3ChatUserShared.shared.modelParams,
+            created_at: CurrentTime(), status: .waiting, attachmentIds: [], updated_at: CurrentTime()
+            
+//            attachments: []
+        )
+ 
+        
+
         let payload = ChatRequest(
-            messages: messages,
+            messages: messages.map({$0.ConvertToMessage()}),
             threadMetadata: threadMetadata,
-            responseMessageId: lastResponseId ?? UUID().uuidString,
+            responseMessageId: assistantMsg.messageId,
             model: model.id,
-            modelParams: T3ChatUserShared.shared.modelParams,
+            modelParams: assistantMsg.modelParams!,
             preferences: preferences,
             userInfo: userInfoPayload,
             convexSessionId: T3ChatUserShared.shared.SessionID.uuidString
         )
 
+        self.messages.append(assistantMsg)
+        self.lastResponseId = assistantMsg.messageId
+        T3ChatUserShared.shared.convex?.SetNewMessage(User: userMessage, Assistant: assistantMsg, threadId: threadMetadata.id)
         do {
             request.httpBody = try JSONEncoder().encode(payload)
         } catch {
@@ -338,6 +355,13 @@ class ChatViewModel: ObservableObject {
             }
             .eraseToAnyPublisher()
     }
+    
+    
+    //     unix time stamp as doube with in miliseconds
+        func CurrentTime() -> Int {
+            print(Int(Date().timeIntervalSince1970 * 1000))
+            return Int(Date().timeIntervalSince1970 * 1000)
+        }
 }
 
 // MARK: - Bubble View

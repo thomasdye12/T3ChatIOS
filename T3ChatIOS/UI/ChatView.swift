@@ -17,15 +17,15 @@ struct ChatView: View {
                         ScrollView {
                             LazyVStack {
                                 chatModelInfo(viewModel: viewModel)
-                                ForEach(viewModel.messages) { msg in
+                                ForEach(viewModel.messages, id: \.messageId) { msg in
                                     ChatBubble(message: msg)
-                                        .id(msg.id)
+                                        .id(msg.messageId)
                                 }
                             }
                         }
                         .onChange(of: viewModel.messages.count) {
                             if let last = viewModel.messages.last {
-                                proxy.scrollTo(last.id, anchor: .bottom)
+                                proxy.scrollTo(last.messageId, anchor: .bottom)
                             }
                         }
         }

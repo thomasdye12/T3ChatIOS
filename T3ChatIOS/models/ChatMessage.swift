@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import ConvexMobile
 
 // MARK: - Model
 struct ChatMessage: Identifiable, Codable {
@@ -26,7 +27,7 @@ struct ChatMessage: Identifiable, Codable {
 }
 
 struct ThreadMetadata: Codable {
-    var id: UUID
+    var id: String
 }
 
 struct ModelParams: Codable {
@@ -182,25 +183,59 @@ struct ConvexMessageThread: Codable,Identifiable {
 
 
 
-struct ConvexChatMessage:Identifiable, Codable {
-        let id: String
-        let userId:String
+struct ConvexChatMessage:Codable,ConvexEncodable {
+//        var id: String {messageId}
+        let messageId:String
         var content: String
         let role: ChatMessage.Role
         let model:String
+        let modelParams:ModelParams?
+        let created_at:Int  
+        let status:status
+        let attachmentIds:[String]
+        var updated_at: Int
     //    let attachments: [String]
 
 
         enum CodingKeys: String, CodingKey {
-            case id = "_id"
+//            case id = "_id"
             case content
             case role
             case model
-            case userId
+            case modelParams
+            case created_at
+            case status
+            case messageId
+            case updated_at
+            case attachmentIds
         }
     
     
-    func ConvertToMessage() -> ChatMessage {
-        return .init(id: id, content: content, role: role)
+    enum status: String, Codable {
+        case done, waiting,streaming
     }
+    
+    
+    
+    func ConvertToMessage() -> ChatMessage {
+        return .init(id: messageId, content: content, role: role)
+    }
+    
+    
+    func toJsonString() -> String? {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = .prettyPrinted // Optional: for human-readable output
+            do {
+                let data = try encoder.encode(self)
+                return String(data: data, encoding: .utf8)
+            } catch {
+                print("Error encoding ConvexChatMessage to JSON: \(error)")
+                return nil
+            }
+        }
+    
+
 }
+
+
+

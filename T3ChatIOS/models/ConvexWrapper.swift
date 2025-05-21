@@ -30,7 +30,7 @@ class T3ConvexWrapper {
     
     
     
-    func arguments() -> [String:String] {
+    func arguments() -> [String:ConvexEncodable] {
         return ["sessionId":SessionID]
     }
     
@@ -48,7 +48,24 @@ class T3ConvexWrapper {
             .eraseToAnyPublisher()  // Erase the specific publisher chain to AnyPublisher<[ConvexMessageThread], Never>
     }
     
-    
+    func SetNewMessage(User:ConvexChatMessage, Assistant:ConvexChatMessage, threadId:String){ // <--- Changed ClientError to Never
+        struct ConvexChatStreamMessage:Codable {
+            let message:[ConvexChatMessage]
+            let threadId:String
+            let sessionId:String
+        }
+        
+
+        var arguments = arguments()
+        arguments["threadId"] = threadId
+        arguments["messages"] = [User,Assistant]
+        print(arguments)
+
+            
+        Task {
+            try await convex.mutation("messages:addMessagesToThread",with: arguments)
+        }
+    }
     
     
     
@@ -57,3 +74,7 @@ class T3ConvexWrapper {
 
 
 
+
+extension Array:ConvexEncodable {
+    
+}
