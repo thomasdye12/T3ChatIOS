@@ -47,15 +47,15 @@ class T3ConvexWrapper {
             .replaceError(with: []) // This makes the error type Never
             .eraseToAnyPublisher()  // Erase the specific publisher chain to AnyPublisher<[ConvexMessageThread], Never>
     }
+    func GetThreadBySearchPublisher(searchString:String) -> AnyPublisher<[ConvexMessageThread], Never> { // <--- Changed ClientError to Never
+        var arguments = arguments()
+        arguments["query"] = searchString
+        return convex.subscribe(to: "threads:search", with: arguments, yielding: [ConvexMessageThread].self)
+            .replaceError(with: []) // This makes the error type Never
+            .eraseToAnyPublisher()  // Erase the specific publisher chain to AnyPublisher<[ConvexMessageThread], Never>
+    }
     
     func SetNewMessage(User:ConvexChatMessage, Assistant:ConvexChatMessage, threadId:String){ // <--- Changed ClientError to Never
-        struct ConvexChatStreamMessage:Codable {
-            let message:[ConvexChatMessage]
-            let threadId:String
-            let sessionId:String
-        }
-        
-
         var arguments = arguments()
         arguments["threadId"] = threadId
         arguments["messages"] = [User,Assistant]
@@ -66,6 +66,17 @@ class T3ConvexWrapper {
             try await convex.mutation("messages:addMessagesToThread",with: arguments)
         }
     }
+    
+    func SetPinnedStatusOfChat(Pinned:Bool,threadId:String){ // <--- Changed ClientError to Never
+        var arguments = arguments()
+        arguments["threadId"] = threadId
+        arguments["pinned"] = Pinned
+        print(arguments)
+        Task {
+            try await convex.mutation("threads:update",with: arguments)
+        }
+    }
+    
     
     
     

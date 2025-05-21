@@ -11,43 +11,58 @@ struct PreviousChatsView: View {
     @ObservedObject var userInfo: T3ChatUserShared
     @State private var groupedMessages: [Date: [ConvexMessageThread]] = [:]
     @State private var pinnedMessages: [ConvexMessageThread] = []
-
+    @State private var SearchMessages: [ConvexMessageThread] = []
+    @State var searchText:String = ""
     // 1. Add a completion closure
     var onChatSelected: (ConvexMessageThread) -> Void
     @Environment(\.dismiss) var dismiss // To dismiss the view
 
     var body: some View {
-        List {
-            // Pinned Chats Section
-            if !pinnedMessages.isEmpty {
-                Section(header: Text("Pinned")) {
-                    ForEach(pinnedMessages) { message in
-                        // 2. Pass the onChatSelected closure to ChatRowView
-                        ChatRowView(message: message) { selectedMessage in
-                            onChatSelected(selectedMessage)
-                            dismiss() // Dismiss the view
+        NavigationStack {
+            List {
+                if searchText == "" {
+                    // Pinned Chats Section
+                    if !pinnedMessages.isEmpty {
+                        Section(header: Text("Pinned")) {
+                            ForEach(pinnedMessages) { message in
+                                // 2. Pass the onChatSelected closure to ChatRowView
+                                ChatRowView(message: message) { selectedMessage in
+                                    onChatSelected(selectedMessage)
+                                    dismiss() // Dismiss the view
+                                }
+                            }
                         }
                     }
-                }
-            }
-
-            // Chats Grouped by Day
-            ForEach(sortedDates, id: \.self) { date in
-                Section(header: Text(userInfo.formattedDate(date))) {
-                    ForEach(groupedMessages[date]?.sorted(
-                        using: KeyPathComparator(\.lastMessageAt, order: .reverse)
-                    ) ?? []) { message in
-                        // 2. Pass the onChatSelected closure to ChatRowView
-                        ChatRowView(message: message) { selectedMessage in
-                            onChatSelected(selectedMessage)
-                            dismiss() // Dismiss the view
+                    
+                    // Chats Grouped by Day
+                    ForEach(sortedDates, id: \.self) { date in
+                        Section(header: Text(userInfo.formattedDate(date))) {
+                            ForEach(groupedMessages[date]?.sorted(
+                                using: KeyPathComparator(\.lastMessageAt, order: .reverse)
+                            ) ?? []) { message in
+                                // 2. Pass the onChatSelected closure to ChatRowView
+                                ChatRowView(message: message) { selectedMessage in
+                                    onChatSelected(selectedMessage)
+                                    dismiss() // Dismiss the view
+                                }
+                            }
                         }
                     }
+                } else {
+                    Text("SEARCH IS NOT IMPLEMENTED")
                 }
             }
-        }
-        .task {
-            await loadChats()
+            .searchable(text: $searchText)
+            .task {
+                await loadChats()
+            }
+            .onChange(of: searchText) { newValue in
+                print(newValue)
+//                Task {
+//                    await loadFromSearch(search: newValue)
+//                }
+            }
+            .navigationTitle("Previous Chats")
         }
     }
 
@@ -73,6 +88,17 @@ struct PreviousChatsView: View {
             }
         }
     }
+    
+    func loadFromSearch(search:String) async {
+        let latestChatsPublisher = userInfo.convex?.GetThreadBySearchPublisher(searchString: search)
+            .replaceError(with: [])
+
+        if let latestChatsPublisher = latestChatsPublisher {
+            for await chats in latestChatsPublisher.values {
+                self.SearchMessages = chats
+            }
+        }
+    }
 }
 
 // Assuming ChatRowView looks something like this initially:
@@ -92,6 +118,13 @@ struct ChatRowView: View {
             .contentShape(Rectangle()) // Makes the whole row tappable
         }
         .buttonStyle(.plain) // Prevents the default button styling
+        .contextMenu {
+            Button {
+                T3ChatUserShared.shared.convex?.SetPinnedStatusOfChat(Pinned: !message.pinned, threadId: message.threadId)
+            } label: {
+                Label(message.pinned ? "Pin" :"UnPin", systemImage: message.pinned ?  "pin.fill" : "pin.slash.fill")
+            }
+        }
     }
 }
 
