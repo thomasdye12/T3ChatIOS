@@ -39,7 +39,7 @@ struct ModelParams: Codable {
 struct Preferences: Codable {
     let name: String
     let occupation: String
-    let selectedTraits: String
+    let selectedTraits: [String]
     let additionalInfo: String
 }
 

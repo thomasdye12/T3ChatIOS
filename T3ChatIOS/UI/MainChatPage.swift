@@ -21,7 +21,8 @@ struct MainChatPage: View {
                     Button(action: {
                         showPreviousChats = true
                     }) {
-                        Text("Chats")
+                        Image(systemName: "folder")
+//                        Label("Chat", image: "folder")
                     }
                     .padding(.leading)
 
@@ -29,6 +30,7 @@ struct MainChatPage: View {
                     Button(action: {
                         userInfo.CurrentUserChat = nil
                     }, label: {
+                        
                         Text("T3.Chat")
                             .bold()
                             .foregroundColor(.accentColor)
@@ -39,7 +41,7 @@ struct MainChatPage: View {
                     Button(action: {
                         showSettings = true
                     }) {
-                        Text("Settings")
+                        Label("Settings", image: "folder")
                     }
                     .padding(.trailing)
                 }

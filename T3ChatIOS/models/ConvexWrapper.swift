@@ -19,7 +19,8 @@ class T3ConvexWrapper {
         self.SessionID = SessionID
 //        local proxy for debug ws://10.0.12.71:8080/api/1.23.0/sync
 //        main endpoint wss://api.sync.t3.chat/api/sync
-        convex = ConvexClientWithAuth<String>(deploymentUrl: "wss://api.sync.t3.chat/api/sync",authProvider: StaticJWTAuthProvider(jwt: JWT))
+//       new main wss://api.sync.t3.chat/api/1.24.7-alpha.2/sync
+        convex = ConvexClientWithAuth<String>(deploymentUrl: "wss://api.sync.t3.chat/api/1.24.7-alpha.2/sync",authProvider: StaticJWTAuthProvider(jwt: JWT))
       
         Task {
             await convex.loginFromCache()

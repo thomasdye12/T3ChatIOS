@@ -42,7 +42,7 @@ class ChatViewModel: ObservableObject {
     private let preferences = Preferences(
         name: "",
         occupation: "",
-        selectedTraits: "",
+        selectedTraits: [""],
         additionalInfo: ""
     )
     private let userInfoPayload = UserInfoPayload(timezone: "Europe/London")
@@ -172,8 +172,8 @@ class ChatViewModel: ObservableObject {
     }
 
     /// Real network call for streaming
-    private func fetchResponseStream(userMessage:ConvexChatMessage) -> AnyPublisher<ChatStreamEvent, Error> {
-        guard let url = URL(string: "https://beta.t3.chat/api/chat") else {
+    private func fetchResponseStream(userMessage:ConvexChatMessage,upload:Bool = true) -> AnyPublisher<ChatStreamEvent, Error> {
+        guard let url = URL(string: "https://t3.chat/api/chat") else {
             return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
         }
         var request = URLRequest(url: url)
@@ -211,7 +211,9 @@ class ChatViewModel: ObservableObject {
 
         self.messages.append(assistantMsg)
         self.lastResponseId = assistantMsg.messageId
-        T3ChatUserShared.shared.convex?.SetNewMessage(User: userMessage, Assistant: assistantMsg, threadId: threadMetadata.id)
+        if upload == false {
+            T3ChatUserShared.shared.convex?.SetNewMessage(User: userMessage, Assistant: assistantMsg, threadId: threadMetadata.id)
+        }
         do {
             request.httpBody = try JSONEncoder().encode(payload)
         } catch {
@@ -364,12 +366,12 @@ class ChatViewModel: ObservableObject {
         }
     
     
-    func fetchCompleteResponse(userMessage: ConvexChatMessage) async throws -> String {
+    func fetchCompleteResponse(userMessage: ConvexChatMessage,upload:Bool = true) async throws -> String {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
             var accumulated = ""
 
             // Kick off the Combine stream
-        fetchResponseStream(userMessage: userMessage)
+            fetchResponseStream(userMessage: userMessage,upload: upload)
                 .receive(on: DispatchQueue.main)
                 .sink { completion in
                     switch completion {
